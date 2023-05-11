@@ -1,0 +1,33 @@
+name: Build Derper for OpenWrt x86
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Check out Tailscale repository
+      uses: actions/checkout@v2
+
+    - name: Build derper binary for OpenWrt x86
+      run: |
+        CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -ldflags "-linkmode external -extldflags '-static' -s -w" -o derper tailscale.com/cmd/derper
+
+    - name: Upload derper binary as a release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./derper
+        asset_name: derper-x86_64-openwrt
+        asset_content_type: application/octet-stream
