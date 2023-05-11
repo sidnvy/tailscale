@@ -2,8 +2,8 @@ name: Build Derper for OpenWrt x86
 
 on:
   push:
-    tags:
-      - '*'
+    branch:
+      - derper
 
 jobs:
   build:
